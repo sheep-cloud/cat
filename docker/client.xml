@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config mode="client">
     <servers>
-        <server ip="127.0.0.1" port="2280" http-port="8080"/>
+        <!--
+            配置说明
+                mode:       定义配置模式, 固定值为client; 暂未使用
+                server:     定义多个服务端信息
+                ip:         配置服务端(cat-home)对外ip地址
+                port:       配置服务端(cat-home)对外tcp协议开启端口, 固定值为2280
+                http-port:  配置服务端(cat-home)对外HTTP协议开启端口, 如: tomcat默认是8080端口, 若未指定, 默认为8080端口.
+        -->
+        <server ip="127.0.0.1" port="2280" http-port="8080" />
     </servers>
 </config>

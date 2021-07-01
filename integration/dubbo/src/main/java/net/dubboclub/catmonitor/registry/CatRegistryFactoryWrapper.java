@@ -5,14 +5,22 @@ import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.registry.NotifyListener;
 import com.alibaba.dubbo.registry.Registry;
 import com.alibaba.dubbo.registry.RegistryFactory;
-import net.dubboclub.catmonitor.constants.CatConstants;
 
 import java.util.List;
 
+import static net.dubboclub.catmonitor.constants.CatConstants.PROVIDER_APPLICATION_NAME;
+
 /**
- * Created by bieber on 2015/11/12.
+ * Cat 注册表工厂包装类
+ *
+ * @author bieber
+ * @date 2015/11/12
  */
 public class CatRegistryFactoryWrapper implements RegistryFactory {
+
+    /**
+     * 注册表工厂。 （SPI、单例、线程安全）
+     */
     private RegistryFactory registryFactory;
 
     public CatRegistryFactoryWrapper(RegistryFactory registryFactory) {
@@ -21,15 +29,21 @@ public class CatRegistryFactoryWrapper implements RegistryFactory {
 
     @Override
     public Registry getRegistry(URL url) {
-        return new RegistryWrapper(registryFactory.getRegistry(url));
+        Registry registry = registryFactory.getRegistry(url);
+        return new RegistryWrapper(registry);
     }
 
-    class RegistryWrapper implements Registry {
+    /**
+     * 注册表。 注册表。 （SPI、原型、线程安全）
+     */
+    static class RegistryWrapper implements Registry {
+
         private Registry originRegistry;
-        private URL appendProviderAppName(URL url){
+
+        private URL appendProviderAppName(URL url) {
             String side = url.getParameter(Constants.SIDE_KEY);
-            if(Constants.PROVIDER_SIDE.equals(side)){
-                url=url.addParameter(CatConstants.PROVIDER_APPLICATION_NAME,url.getParameter(Constants.APPLICATION_KEY));
+            if (Constants.PROVIDER_SIDE.equals(side)) {
+                url = url.addParameter(PROVIDER_APPLICATION_NAME, url.getParameter(Constants.APPLICATION_KEY));
             }
             return url;
         }
@@ -65,17 +79,19 @@ public class CatRegistryFactoryWrapper implements RegistryFactory {
 
         @Override
         public void subscribe(URL url, NotifyListener listener) {
-            originRegistry.subscribe(url,listener);
+            originRegistry.subscribe(url, listener);
         }
 
         @Override
         public void unsubscribe(URL url, NotifyListener listener) {
-            originRegistry.unsubscribe(url,listener);
+            originRegistry.unsubscribe(url, listener);
         }
 
         @Override
         public List<URL> lookup(URL url) {
             return originRegistry.lookup(appendProviderAppName(url));
         }
+
     }
+
 }
