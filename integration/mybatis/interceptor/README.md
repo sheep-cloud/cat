@@ -1,7 +1,7 @@
 
 # mybatis 配置插件 
 
-```
+```java
      @Value("${jdbc-url}")
      private String jdbcUrl;
          

@@ -3,7 +3,7 @@
 我是搬运工 原作者@Monocc
 # mybatis 配置插件 
 
-```
+```xml
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource">
             <ref bean="dataSource" />
