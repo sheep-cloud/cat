@@ -1,5 +1,6 @@
 package net.dubboclub.catmonitor.registry;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
 import com.alibaba.dubbo.registry.NotifyListener;
@@ -34,7 +35,7 @@ public class CatRegistryFactoryWrapper implements RegistryFactory {
     }
 
     /**
-     * 注册表。 注册表。 （SPI、原型、线程安全）
+     * 注册表。 （SPI、原型、线程安全）
      */
     static class RegistryWrapper implements Registry {
 
@@ -42,9 +43,10 @@ public class CatRegistryFactoryWrapper implements RegistryFactory {
 
         private URL appendProviderAppName(URL url) {
             String side = url.getParameter(Constants.SIDE_KEY);
-            if (Constants.PROVIDER_SIDE.equals(side)) {
+            if (StrUtil.equals(Constants.PROVIDER_SIDE, side)) {
                 url = url.addParameter(PROVIDER_APPLICATION_NAME, url.getParameter(Constants.APPLICATION_KEY));
             }
+
             return url;
         }
 

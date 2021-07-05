@@ -48,9 +48,11 @@ public class CatTransaction implements Filter {
 
         URL url = invoker.getUrl();
         String sideKey = url.getParameter(Constants.SIDE_KEY);
-        // 例: HelloService.hello
-        String loggerName = invoker.getInterface()
-                                   .getSimpleName() + "." + invocation.getMethodName();
+        // 接口名.方法名. 例: HelloService.hello
+        String interfaceSimpleName = invoker.getInterface()
+                                            .getSimpleName();
+        String loggerName = StrUtil.format("{}.{}", interfaceSimpleName, invocation.getMethodName());
+
         String type = CROSS_CONSUMER;
         if (Constants.PROVIDER_SIDE.equals(sideKey)) {
             type = CROSS_SERVER;
@@ -63,10 +65,10 @@ public class CatTransaction implements Filter {
             transaction = Cat.newTransaction(type, loggerName);
             Cat.Context context = getContext();
             if (Constants.CONSUMER_SIDE.equals(sideKey)) {
-                createConsumerCross(url, transaction);
+                this.createConsumerCross(url, transaction);
                 Cat.logRemoteCallClient(context);
             } else {
-                createProviderCross(url, transaction);
+                this.createProviderCross(url, transaction);
                 Cat.logRemoteCallServer(context);
             }
             setAttachment(context);
@@ -89,8 +91,8 @@ public class CatTransaction implements Filter {
                 return result;
             }
 
+            // 给调用接口出现异常进行打点
             if (result.hasException()) {
-                // 给调用接口出现异常进行打点
                 Throwable throwable = result.getException();
                 Event event;
                 if (RpcException.class == throwable.getClass()) {
@@ -167,6 +169,12 @@ public class CatTransaction implements Filter {
         }
     }
 
+    /**
+     * 获取服务提供方AppName
+     *
+     * @param url
+     * @return
+     */
     private String getProviderAppName(URL url) {
         String appName = url.getParameter(PROVIDER_APPLICATION_NAME);
         if (StrUtil.isEmpty(appName)) {
@@ -209,6 +217,12 @@ public class CatTransaction implements Filter {
         return context;
     }
 
+    /**
+     * 创建服务消费者Cross
+     *
+     * @param url
+     * @param transaction
+     */
     private void createConsumerCross(URL url, Transaction transaction) {
         Event crossAppEvent = Cat.newEvent(CONSUMER_CALL_APP, getProviderAppName(url));
         Event crossServerEvent = Cat.newEvent(CONSUMER_CALL_SERVER, url.getHost());
@@ -227,9 +241,15 @@ public class CatTransaction implements Filter {
         transaction.addChild(crossServerEvent);
     }
 
+    /**
+     * 创建服务提供者Cross
+     *
+     * @param url
+     * @param transaction
+     */
     private void createProviderCross(URL url, Transaction transaction) {
         RpcContext rpcContext = RpcContext.getContext();
-        String consumerAppName = StrUtil.emptyToDefault(rpcContext.getAttachment(Constants.APPLICATION_KEY), rpcContext.getRemoteHost() + ":" + rpcContext.getRemotePort());
+        String consumerAppName = StrUtil.emptyToDefault(rpcContext.getAttachment(Constants.APPLICATION_KEY), StrUtil.format("{}.{}", rpcContext.getRemoteHost(), rpcContext.getRemotePort()));
 
         Event crossAppEvent = Cat.newEvent(PROVIDER_CALL_APP, consumerAppName);
         Event crossServerEvent = Cat.newEvent(PROVIDER_CALL_SERVER, rpcContext.getRemoteHost());
