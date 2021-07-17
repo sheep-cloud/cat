@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.codehaus.plexus.PlexusContainer;
+import org.unidal.lookup.PlexusContainer;
 import org.unidal.initialization.DefaultModuleContext;
 import org.unidal.initialization.ModuleContext;
 import org.unidal.lookup.ContainerLoader;
