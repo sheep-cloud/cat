@@ -104,6 +104,7 @@ public class Cat {
 	}
 
 	public static String getCatHome() {
+		// CAT_HOME_DEFAULT_DIR = "/data/appdatas/cat/"
 		String catHome = CatPropertyProvider.INST.getProperty("CAT_HOME", CatConstants.CAT_HOME_DEFAULT_DIR);
 		if (!catHome.endsWith("/")) {
 			catHome = catHome + "/";
@@ -154,6 +155,7 @@ public class Cat {
 
 	public static MessageProducer getProducer() {
 		try {
+			// 懒加载
 			checkAndInitialize();
 
 			MessageProducer producer = s_instance.m_producer;
@@ -175,6 +177,7 @@ public class Cat {
 			if (!s_init) {
 				synchronized (s_instance) {
 					if (!s_init) {
+						// 使用点评Plexus容器加载对应的模块
 						PlexusContainer container = ContainerLoader.getDefaultContainer();
 						ModuleContext ctx = new DefaultModuleContext(container);
 						Module module = ctx.lookup(Module.class, CatClientModule.ID);

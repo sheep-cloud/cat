@@ -249,12 +249,15 @@ public class DefaultMessageProducer implements MessageProducer {
 	@Override
 	public Transaction newTransaction(String type, String name) {
 		// this enable CAT client logging cat message without explicit setup
+		// 创建线程上下文
 		if (!m_manager.hasContext()) {
 			m_manager.setup();
 		}
 
+		// 创建Transaction
 		DefaultTransaction transaction = new DefaultTransaction(type, name, m_manager);
 
+		// 添加到线程上下文中
 		m_manager.start(transaction, false);
 		return transaction;
 	}

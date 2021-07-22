@@ -81,6 +81,7 @@ public class DefaultTransaction extends AbstractMessage implements Transaction {
 				}
 				setCompleted(true);
 				if (m_manager != null) {
+					// 关闭这一次的
 					m_manager.end(this);
 				}
 			}

@@ -125,9 +125,11 @@ public class DefaultMessageManager extends ContainerHolder implements MessageMan
 	}
 
 	public void flush(MessageTree tree, boolean clearContext) {
+		// 获取发送类对象
 		MessageSender sender = m_transportManager.getSender();
 
 		if (sender != null && isMessageEnabled()) {
+			// 发送
 			sender.send(tree);
 
 			if (clearContext) {
@@ -442,6 +444,7 @@ public class DefaultMessageManager extends ContainerHolder implements MessageMan
 			if (!m_stack.isEmpty()) {
 				Transaction current = m_stack.pop();
 
+				// 取到栈底的Transaction
 				if (transaction == current) {
 					m_validator.validate(m_stack.isEmpty() ? null : m_stack.peek(), current);
 				} else {
@@ -462,6 +465,7 @@ public class DefaultMessageManager extends ContainerHolder implements MessageMan
 						adjustForTruncatedTransaction((Transaction) tree.getMessage());
 					}
 
+					// 刷新并发送数据
 					manager.flush(tree, true);
 					return true;
 				}
