@@ -176,6 +176,7 @@ public class TcpSocketSender implements Task, MessageSender, LogEnabled {
 				logQueueFullInfo(tree);
 			}
 		} else {
+			// 生产者-消费者模型
 			boolean result = m_queue.offer(tree);
 
 			if (!result) {
@@ -205,6 +206,7 @@ public class TcpSocketSender implements Task, MessageSender, LogEnabled {
 
 			if (channel != null) {
 				try {
+					// 拉取消息
 					MessageTree tree = m_queue.poll();
 
 					if (tree != null) {
@@ -281,10 +283,12 @@ public class TcpSocketSender implements Task, MessageSender, LogEnabled {
 			tree.setMessageId(m_factory.getNextId());
 		}
 
+		// 自定义序列化方式
 		ByteBuf buf = m_codec.encode(tree);
 
 		int size = buf.readableBytes();
 
+		// 使用Netty进行数据发送
 		channel.channel().writeAndFlush(buf);
 
 		if (m_statistics != null) {
